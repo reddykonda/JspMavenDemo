@@ -1,0 +1,26 @@
+node {
+    stage ('checkout'){
+        git 'https://github.com/reddykonda/JspMavenDemo.git'
+    }
+    stage('Mvn package'){
+        def mvnHome = tool name: 'maven_3_6_0', type: 'maven'
+        def mvnCMD = "${mvnHome}/bin/mvn"
+        sh "${mvnCMD} clean package"
+    }
+    stage('Build docker image'){
+        sh 'docker build -t devops-poc/jsp:1.0.0 .'
+    }
+    stage('Push Docker Image'){
+        withCredentials([usernamePassword(credentialsId: 'dockerHub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
+            sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
+            sh 'docker push devops-poc/jsp:1.0.0'
+        }
+    }
+    stage('Run Container on Dev Server'){
+    def dockerRun = 'docker run -p 8081:8081 -d --name JspMavenDemo devops-poc/jsp:1.0.0'
+    sshagent(['home-server']) {
+        sh "ssh -o StrictHostKeyChecking=no ec2-user@18.191.188.135 '${dockerRun}'"
+    }
+  }
+    
+}
