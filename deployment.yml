@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx-deployment
+  name: JspMavenDemo
   labels:
-    app: nginx
+    app: JspMavenDemo
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: nginx
+      app: JspMavenDemo
   template:
     metadata:
       labels:
-        app: nginx
+        app: JspMavenDemo
     spec:
       containers:
-      - name: nginx
+      - name: JspMavenDemo
         image: devops-poc/jsp:1.0.0
         ports:
         - containerPort: 80
